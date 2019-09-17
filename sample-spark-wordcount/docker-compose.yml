@@ -25,10 +25,6 @@ services:
     volumes:
       - ./conf/master:/conf
       - ./data:/tmp/data
-      - ./target/sample-spark-wordcount-1.0-SNAPSHOT.jar:/app/sample-spark-wordcount-1.0-SNAPSHOT.jar
-      - ./input.txt:/app/input.txt
-      - ./run.sh:/app/run.sh
-    #command: /app/run.sh
 
   worker-1:
     image: gettyimages/spark
@@ -56,6 +52,8 @@ services:
       - ./conf/worker:/conf
       - ./data:/tmp/data
       - ./input.txt:/app/input.txt
+    depends_on:
+      - master
 
   worker-2:
     image: gettyimages/spark
@@ -83,3 +81,31 @@ services:
       - ./conf/worker:/conf
       - ./data:/tmp/data
       - ./input.txt:/app/input.txt
+    depends_on:
+      - master
+
+  submit:
+    image: gettyimages/spark
+    container_name: spark-submit
+    command: /app/run.sh
+    hostname: submit
+    environment:
+      SPARK_CONF_DIR: /conf
+      SPARK_PUBLIC_DNS: localhost
+    links:
+      - master
+    expose:
+      - 7012
+      - 7013
+      - 7014
+      - 7015
+      - 8881
+    ports:
+      - 8085:8085
+    volumes:
+      - ./input.txt:/app/input.txt
+      - ./target/sample-spark-wordcount-1.0-SNAPSHOT.jar:/app/sample-spark-wordcount-1.0-SNAPSHOT.jar
+      - ./run.sh:/app/run.sh
+    depends_on:
+      - master
+

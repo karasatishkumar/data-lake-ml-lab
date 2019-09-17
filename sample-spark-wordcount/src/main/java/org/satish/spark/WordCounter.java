@@ -20,7 +20,7 @@ public class WordCounter
             System.exit(1);
         }
         SparkSession spark = SparkSession.builder().appName(WordCounter.class.getSimpleName()).master(
-            "local").getOrCreate();
+            "spark://master:7077").getOrCreate();
         Dataset<String> df = spark.read().textFile(args[0]);
         FlatMapFunction<String, String> wordsExtractFunction = (line) -> {
             String lowerCaseLine = line.toLowerCase();
@@ -28,6 +28,6 @@ public class WordCounter
         };
         Dataset<String> words = df.flatMap(wordsExtractFunction, Encoders.STRING());
         Dataset<Row> countDS = words.groupBy("value").count();
-        countDS.show();
+        countDS.show(50, 0, false);
     }
 }
