@@ -141,6 +141,6 @@ As we’re going to create a Word Counter program, we will create a sample input
 
 ### Running the Application
 
-    mvn exec:java -Dexec.mainClass=org.satish.spark.WordCounter -Dexec.args="input.txt"
+    mvn exec:java -Dexec.mainClass=WordCounter -Dexec.args="input.txt"
 
     

@@ -1,4 +1,4 @@
-package org.satish.spark;
+package org.ns2.spark;
 
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.sql.Dataset;
