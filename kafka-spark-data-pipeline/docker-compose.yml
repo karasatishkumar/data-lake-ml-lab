@@ -1,0 +1,144 @@
+version: "2.2"
+services:
+  master:
+    image: gettyimages/spark
+    container_name: spark-master
+    command: bin/spark-class org.apache.spark.deploy.master.Master -h master
+    hostname: master
+    environment:
+      MASTER: spark://master:7077
+      SPARK_CONF_DIR: /conf
+      SPARK_PUBLIC_DNS: localhost
+    expose:
+      - 7001
+      - 7002
+      - 7003
+      - 7004
+      - 7005
+      - 7077
+      - 6066
+    ports:
+      - 4040:4040
+      - 6066:6066
+      - 7077:7077
+      - 8082:8080
+    volumes:
+      - ./jar/kafka-clients-0.10.0.1.jar:/usr/spark-2.4.1/jars/kafka-clients-0.10.0.1.jar.jar
+      - ./conf/master:/conf
+      - ./data:/tmp/data
+
+  worker-1:
+    image: gettyimages/spark
+    container_name: spark-worker-1
+    command: bin/spark-class org.apache.spark.deploy.worker.Worker spark://master:7077
+    hostname: worker
+    environment:
+      SPARK_CONF_DIR: /conf
+      SPARK_WORKER_CORES: 2
+      SPARK_WORKER_MEMORY: 1g
+      SPARK_WORKER_PORT: 8883
+      SPARK_WORKER_WEBUI_PORT: 8083
+      SPARK_PUBLIC_DNS: localhost
+    links:
+      - master
+    expose:
+      - 7012
+      - 7013
+      - 7014
+      - 7015
+      - 8881
+    ports:
+      - 8083:8083
+    volumes:
+      - ./jar/kafka-clients-0.10.0.1.jar:/usr/spark-2.4.1/jars/kafka-clients-0.10.0.1.jar.jar
+      - ./conf/worker:/conf
+      - ./data:/tmp/data
+      - ./input.txt:/app/input.txt
+    depends_on:
+      - master
+
+  worker-2:
+    image: gettyimages/spark
+    container_name: spark-worker-2
+    command: bin/spark-class org.apache.spark.deploy.worker.Worker spark://master:7077
+    hostname: worker
+    environment:
+      SPARK_CONF_DIR: /conf
+      SPARK_WORKER_CORES: 2
+      SPARK_WORKER_MEMORY: 1g
+      SPARK_WORKER_PORT: 8884
+      SPARK_WORKER_WEBUI_PORT: 8084
+      SPARK_PUBLIC_DNS: localhost
+    links:
+      - master
+    expose:
+      - 7012
+      - 7013
+      - 7014
+      - 7015
+      - 8881
+    ports:
+      - 8084:8084
+    volumes:
+      - ./jar/kafka-clients-0.10.0.1.jar:/usr/spark-2.4.1/jars/kafka-clients-0.10.0.1.jar.jar
+      - ./conf/worker:/conf
+      - ./data:/tmp/data
+      - ./input.txt:/app/input.txt
+    depends_on:
+      - master
+
+  submit:
+    image: gettyimages/spark
+    container_name: spark-submit
+    hostname: submit
+    environment:
+      SPARK_CONF_DIR: /conf
+      SPARK_PUBLIC_DNS: localhost
+    links:
+      - master
+    expose:
+      - 7012
+      - 7013
+      - 7014
+      - 7015
+      - 8881
+    ports:
+      - 8085:8085
+    volumes:
+      - ./jar/kafka-clients-0.10.0.1.jar:/usr/spark-2.4.1/jars/kafka-clients-0.10.0.1.jar.jar
+      - ./input.txt:/app/input.txt
+      - ./target/kafka-spark-data-pipeline-1.0-SNAPSHOT-jar-with-dependencies.jar:/app/kafka-spark-data-pipeline-1.0-SNAPSHOT.jar
+      - ./run.sh:/app/run.sh
+    depends_on:
+      - master
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
+    restart: always
+    ports:
+      - 2181:2181
+
+  kafka:
+    image: wurstmeister/kafka
+    container_name: kafka
+    restart: always
+    ports:
+      - 9092:9092
+    depends_on:
+      - zookeeper
+    links:
+      - zookeeper:zookeeper
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: 10.137.33.201
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "messages:1:1"
+
+  cassandra:
+    image: bitnami/cassandra:latest
+    container_name: cassandra
+    volumes:
+      - ./cassandra.sh:/cassandra.sh
+      - ./cassandra-bootstrap.cql:/cassandra-bootstrap.cql
+
