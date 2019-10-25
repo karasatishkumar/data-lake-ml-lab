@@ -28,7 +28,7 @@ public class WordCounter
     public static void main (String[] args) throws InterruptedException
     {
         Map<String, Object> kafkaParams = new HashMap<>();
-        kafkaParams.put("bootstrap.servers", "10.137.33.201:9092");
+        kafkaParams.put("bootstrap.servers", "192.168.1.7:9092");
         kafkaParams.put("key.deserializer", StringDeserializer.class);
         kafkaParams.put("value.deserializer", StringDeserializer.class);
         kafkaParams.put("group.id", "use_a_separate_group_id_for_each_stream");
@@ -38,7 +38,7 @@ public class WordCounter
         Collection<String> topics = Arrays.asList("messages");
 
         SparkConf conf = new SparkConf().setAppName(WordCounter.class.getSimpleName()).setMaster(
-            "local").set("spark.cassandra.connection.host", "cassandra").set(
+            "spark://master:7077").set("spark.cassandra.connection.host", "cassandra").set(
             "spark.cassandra.auth.username",
             "cassandra").set("spark.cassandra.auth.password", "cassandra");
 
@@ -65,7 +65,7 @@ public class WordCounter
             for (String key : wordCountMap.keySet()) {
                 List<Word> wordList = Arrays.asList(new Word(key, wordCountMap.get(key)));
                 for (Word word : wordList) {
-                    logger.error("######################### word : {}" + word);
+                    logger.error("########################################################## word : {}" + word);
                 }
                 JavaRDD<Word> rdd = streamingContext.sparkContext().parallelize(wordList);
 

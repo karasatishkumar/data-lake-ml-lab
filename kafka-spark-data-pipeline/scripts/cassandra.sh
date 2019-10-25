@@ -5,4 +5,4 @@ echo '#################################';
 echo '# CONFIGURING CASSANDRA #';
 echo '#################################';
 
-cqlsh -f cassandra-bootstrap.cql -u cassandra -p cassandra localhost
+cqlsh -f cassandra-bootstrap.cql -u cassandra -p cassandra
