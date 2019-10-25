@@ -3,7 +3,6 @@ package org.ns2.spark;
 import com.datastax.spark.connector.japi.CassandraJavaUtil;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -28,11 +27,6 @@ public class WordCounter
 
     public static void main (String[] args) throws InterruptedException
     {
-        Logger.getLogger("org")
-            .setLevel(Level.OFF);
-        Logger.getLogger("akka")
-            .setLevel(Level.OFF);
-
         Map<String, Object> kafkaParams = new HashMap<>();
         kafkaParams.put("bootstrap.servers", "10.137.33.201:9092");
         kafkaParams.put("key.deserializer", StringDeserializer.class);
@@ -40,12 +34,13 @@ public class WordCounter
         kafkaParams.put("group.id", "use_a_separate_group_id_for_each_stream");
         kafkaParams.put("auto.offset.reset", "latest");
         kafkaParams.put("enable.auto.commit", false);
-        //kafkaParams.put("partition.assignment.strategy", "range");
 
         Collection<String> topics = Arrays.asList("messages");
 
         SparkConf conf = new SparkConf().setAppName(WordCounter.class.getSimpleName()).setMaster(
-            "spark://master:7077").set("spark.cassandra.connection.host", "127.0.0.1");
+            "local").set("spark.cassandra.connection.host", "cassandra").set(
+            "spark.cassandra.auth.username",
+            "cassandra").set("spark.cassandra.auth.password", "cassandra");
 
         JavaStreamingContext streamingContext = new JavaStreamingContext(conf,
             Durations.seconds(1));
@@ -73,6 +68,7 @@ public class WordCounter
                     logger.error("######################### word : {}" + word);
                 }
                 JavaRDD<Word> rdd = streamingContext.sparkContext().parallelize(wordList);
+
                 CassandraJavaUtil.javaFunctions(rdd).writerBuilder("vocabulary",
                     "words",
                     CassandraJavaUtil.mapToRow(Word.class)).saveToCassandra();
