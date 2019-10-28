@@ -3,6 +3,14 @@ This repository is to demonstrate highly scalable and fault tolerant data pipeli
 
 ![Streaming](images/stream.png)
 
+## Leveraging Checkpoints
+
+In a stream processing application, it's often useful to retain state between batches of data being processed.
+
+For example, in `WordCounter.java`, we are only able to store the current frequency of the words. What if we want to store the cumulative frequency instead? Spark Streaming makes it possible through a concept called checkpoints.
+
+![Streaming using Checkpoints](images/stream-checkpoints.png)
+
 ## Prerequisites
 Before we start let's make sure we have the following prerequisites in place
 * Java 8
@@ -50,7 +58,11 @@ After completing the prerequisites, you can follow the instructions to build and
 
 ###### Running the application in Spark Submit Container
     docker exec -it spark-submit /bin/bash
-    sh /app/run.sh    
+    sh /app/run.sh 
+    
+###### Running the checkpoints application in Spark Submit Container
+    docker exec -it spark-submit /bin/bash
+    sh /app/run-checkpoints.sh        
 
 ###### Publish text to Kafka Topic
     docker exec -it kafka /bin/bash
