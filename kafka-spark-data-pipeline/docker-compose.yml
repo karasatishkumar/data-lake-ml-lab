@@ -106,6 +106,7 @@ services:
       - ./jar/kafka-clients-0.10.0.1.jar:/usr/spark-2.4.1/jars/kafka-clients-0.10.0.1.jar.jar
       - ./target/kafka-spark-data-pipeline-1.0-SNAPSHOT-jar-with-dependencies.jar:/app/kafka-spark-data-pipeline-1.0-SNAPSHOT.jar
       - ./scripts/run.sh:/app/run.sh
+      - ./scripts/run.sh:/app/run-checkpoints.sh
     depends_on:
       - master
 
@@ -127,7 +128,7 @@ services:
     links:
       - zookeeper:zookeeper
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: 192.168.1.7
+      KAFKA_ADVERTISED_HOST_NAME: 192.168.1.4
       KAFKA_ADVERTISED_PORT: 9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_CREATE_TOPICS: "messages:1:1"
