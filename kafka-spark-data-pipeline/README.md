@@ -1,4 +1,4 @@
-## Kafka Spark Data Pipeline [![Build Status](https://travis-ci.org/karasatishkumar/easylocate.svg?branch=master)](https://travis-ci.org/karasatishkumar/easylocate)
+## Kafka Spark Data Pipeline [![Build Status](https://travis-ci.org/karasatishkumar/dc-ai-ml-lab.svg?branch=master)](https://travis-ci.org/karasatishkumar/dc-ai-ml-lab)
 This repository is to demonstrate highly scalable and fault tolerant data pipeline for a real-time data stream. We will read the text from kafka topic to process the word count and finally persist the result in cassandra.
 
 ![Streaming](images/stream.png)
