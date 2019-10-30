@@ -1,0 +1,17 @@
+language: java
+
+jdk:
+  - oraclejdk8
+
+script:
+  - cd sample-spark-wordcount
+  - mvn clean install -Dmaven.test.skip=true
+  - cd ..
+  - cd kafka-spark-data-pipeline
+  - mvn clean install -Dmaven.test.skip=true
+
+notifications:
+  email:
+    - karasatishkumar@gmail.com
+  on_success: always
+  on_failure: always
